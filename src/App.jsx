@@ -31,6 +31,7 @@ export default function App() {
    });
 
    const [customInput, setCustomInput] = useState("");
+   const [errorMsg, setErrorMsg] = useState("");
 
    const handleDragEnd = (result) => {
       const { source, destination } = result;
@@ -77,17 +78,37 @@ export default function App() {
    };
 
    const handleAddCustom = () => {
-      if (customInput.trim() !== "") {
-         const newItem = {
-            id: Date.now().toString(),
-            name: customInput.trim(),
-         };
-         // langsung update customColumns.pool
-         setCustomColumns({
-            ...customColumns,
-            pool: [...customColumns.pool, newItem],
-         });
-         setCustomInput("");
+      const newName = customInput.trim();
+      if (newName === "") return;
+
+      // cek duplikat (case insensitive)
+      const exists = customColumns.pool.some(
+         (item) => item.name.toLowerCase() === newName.toLowerCase()
+      );
+      if (exists) {
+         setErrorMsg(`Item "${newName}" sudah ada!`);
+         // atau pakai alert("Item sudah ada")
+         return;
+      }
+
+      const newItem = {
+         id: Date.now().toString(),
+         name: newName,
+      };
+
+      setCustomColumns({
+         ...customColumns,
+         pool: [...customColumns.pool, newItem],
+      });
+      setCustomInput("");
+      setErrorMsg("");
+   };
+
+   // event handler Enter
+   const handleKeyDown = (e) => {
+      if (e.key === "Enter") {
+         e.preventDefault();
+         handleAddCustom();
       }
    };
 
@@ -141,17 +162,22 @@ export default function App() {
                <h2 className="font-bold mb-2">Masukkan Musik/Band:</h2>
                <div className="flex gap-2 mb-2">
                   <input
+                     type="text"
                      value={customInput}
                      onChange={(e) => setCustomInput(e.target.value)}
-                     placeholder="Nama band/musik"
-                     className="border rounded px-2 py-1 flex-1"
+                     onKeyDown={handleKeyDown} // shortcut Enter
+                     className="border rounded p-2 w-full"
+                     placeholder="Tambahkan nama band/musik..."
                   />
                   <button
                      onClick={handleAddCustom}
-                     className="bg-green-500 text-white px-3 py-1 rounded"
+                     className="mt-2 px-4 py-2 bg-blue-500 text-white rounded"
                   >
                      Tambah
                   </button>
+                  {errorMsg && (
+                     <p className="mt-1 text-red-500 text-sm">{errorMsg}</p>
+                  )}
                </div>
             </div>
          )}
