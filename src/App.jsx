@@ -1,17 +1,20 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { DragDropContext } from "@hello-pangea/dnd";
 import GradeColumn from "./components/GradeColumn";
 import ItemCard from "./components/ItemCard";
-import { classicBands } from "./data";
+import { classicData } from "./data";
 
 const grades = ["S", "A", "B", "C", "D", "E"];
 
 export default function App() {
    const [mode, setMode] = useState("classic");
 
-   // state terpisah
+   // classic category/subcategory state
+   const [classicCategory, setClassicCategory] = useState("band");
+   const [musicSubcategory, setMusicSubcategory] = useState("rock");
+
    const [classicColumns, setClassicColumns] = useState({
-      pool: classicBands,
+      pool: classicData.band,
       S: [],
       A: [],
       B: [],
@@ -33,25 +36,46 @@ export default function App() {
    const [customInput, setCustomInput] = useState("");
    const [errorMsg, setErrorMsg] = useState("");
 
+   // update pool otomatis saat category/subcategory berubah
+   useEffect(() => {
+      if (mode === "classic") {
+         if (classicCategory === "band") {
+            setClassicColumns({
+               pool: classicData.band,
+               S: [],
+               A: [],
+               B: [],
+               C: [],
+               D: [],
+               E: [],
+            });
+         } else if (classicCategory === "music") {
+            setClassicColumns({
+               pool: classicData.music[musicSubcategory] || [],
+               S: [],
+               A: [],
+               B: [],
+               C: [],
+               D: [],
+               E: [],
+            });
+         }
+      }
+   }, [mode, classicCategory, musicSubcategory]);
+
    const handleDragEnd = (result) => {
       const { source, destination } = result;
-
-      // kalau tidak ada tujuan drop
       if (!destination) return;
-
-      // kalau posisi sumber dan tujuan sama persis, tidak usah ubah state
       if (
          source.droppableId === destination.droppableId &&
          source.index === destination.index
-      ) {
+      )
          return;
-      }
 
       const current = mode === "classic" ? classicColumns : customColumns;
       const setCurrent =
          mode === "classic" ? setClassicColumns : setCustomColumns;
 
-      // jika drag di kolom yang sama
       if (source.droppableId === destination.droppableId) {
          const columnItems = Array.from(current[source.droppableId]);
          const [moved] = columnItems.splice(source.index, 1);
@@ -62,10 +86,8 @@ export default function App() {
             [source.droppableId]: columnItems,
          });
       } else {
-         // drag ke kolom berbeda
          const startItems = Array.from(current[source.droppableId]);
          const [moved] = startItems.splice(source.index, 1);
-
          const endItems = Array.from(current[destination.droppableId]);
          endItems.splice(destination.index, 0, moved);
 
@@ -81,13 +103,11 @@ export default function App() {
       const newName = customInput.trim();
       if (newName === "") return;
 
-      // cek duplikat (case insensitive)
       const exists = customColumns.pool.some(
          (item) => item.name.toLowerCase() === newName.toLowerCase()
       );
       if (exists) {
          setErrorMsg(`Item "${newName}" sudah ada!`);
-         // atau pakai alert("Item sudah ada")
          return;
       }
 
@@ -104,7 +124,6 @@ export default function App() {
       setErrorMsg("");
    };
 
-   // event handler Enter
    const handleKeyDown = (e) => {
       if (e.key === "Enter") {
          e.preventDefault();
@@ -115,23 +134,31 @@ export default function App() {
    const handleSwitchMode = (newMode) => {
       setMode(newMode);
       if (newMode === "classic") {
-         // reset classic
-         setClassicColumns({
-            pool: classicBands,
-            S: [],
-            A: [],
-            B: [],
-            C: [],
-            D: [],
-            E: [],
-         });
-      }
-      if (newMode === "custom") {
-         // tidak perlu reset custom, biarkan state customColumns seperti terakhir
+         // reset sesuai category
+         if (classicCategory === "band") {
+            setClassicColumns({
+               pool: classicData.band,
+               S: [],
+               A: [],
+               B: [],
+               C: [],
+               D: [],
+               E: [],
+            });
+         } else {
+            setClassicColumns({
+               pool: classicData.music[musicSubcategory] || [],
+               S: [],
+               A: [],
+               B: [],
+               C: [],
+               D: [],
+               E: [],
+            });
+         }
       }
    };
 
-   // pilih data sesuai mode
    const columns = mode === "classic" ? classicColumns : customColumns;
 
    return (
@@ -157,6 +184,41 @@ export default function App() {
             </button>
          </div>
 
+         {mode === "classic" && (
+            <div className="mb-4 flex flex-col md:flex-row gap-4">
+               <div>
+                  <label className="block mb-1 font-bold">Kategori:</label>
+                  <select
+                     value={classicCategory}
+                     onChange={(e) => setClassicCategory(e.target.value)}
+                     className="border rounded px-2 py-1"
+                  >
+                     <option value="band">Band</option>
+                     <option value="music">Musik</option>
+                  </select>
+               </div>
+
+               {classicCategory === "music" && (
+                  <div>
+                     <label className="block mb-1 font-bold">
+                        Subkategori:
+                     </label>
+                     <select
+                        value={musicSubcategory}
+                        onChange={(e) => setMusicSubcategory(e.target.value)}
+                        className="border rounded px-2 py-1"
+                     >
+                        {Object.keys(classicData.music).map((sub) => (
+                           <option key={sub} value={sub}>
+                              {sub}
+                           </option>
+                        ))}
+                     </select>
+                  </div>
+               )}
+            </div>
+         )}
+
          {mode === "custom" && (
             <div className="mb-4">
                <h2 className="font-bold mb-2">Masukkan Musik/Band:</h2>
@@ -165,20 +227,20 @@ export default function App() {
                      type="text"
                      value={customInput}
                      onChange={(e) => setCustomInput(e.target.value)}
-                     onKeyDown={handleKeyDown} // shortcut Enter
+                     onKeyDown={handleKeyDown}
                      className="border rounded p-2 w-full"
                      placeholder="Tambahkan nama band/musik..."
                   />
                   <button
                      onClick={handleAddCustom}
-                     className="mt-2 px-4 py-2 bg-blue-500 text-white rounded"
+                     className="px-4 py-2 bg-blue-500 text-white rounded"
                   >
                      Tambah
                   </button>
-                  {errorMsg && (
-                     <p className="mt-1 text-red-500 text-sm">{errorMsg}</p>
-                  )}
                </div>
+               {errorMsg && (
+                  <p className="mt-1 text-red-500 text-sm">{errorMsg}</p>
+               )}
             </div>
          )}
 
