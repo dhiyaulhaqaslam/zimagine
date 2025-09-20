@@ -4,6 +4,7 @@ import GradeColumn from "./components/GradeColumn";
 import ItemCard from "./components/ItemCard";
 import { classicData } from "./data";
 import logo from "./assets/logo.png";
+import { motion, AnimatePresence } from "framer-motion";
 
 const grades = ["S", "A", "B", "C", "D", "E"];
 
@@ -190,125 +191,131 @@ export default function App() {
 
    const columns = mode === "classic" ? classicColumns : customColumns;
 
-   if (showLanding) {
-      return (
-         <div className="flex flex-col items-center justify-center h-screen bg-gradient-to-b from-blue-500 to-purple-600 text-white">
-            <img src={logo} alt="Logo" className="w-20 h-20 mb-6" />
-            <h1 className="text-4xl font-bold mb-4">Zimagine</h1>
-            <p className="mb-8 text-lg">Drag & Drop Tierlist Musik Favoritmu</p>
-            <button
-               onClick={() => setShowLanding(false)}
-               className="px-6 py-3 bg-white text-blue-600 rounded-lg font-semibold hover:bg-gray-200 transition"
-            >
-               Start
-            </button>
-         </div>
-      );
-   }
-
    return (
-      <div className="p-4 max-w-6xl mx-auto">
-         <div className="flex justify-center items-center py-4">
-            <img className="w-10 h-10" src={logo} alt="Logo" />
-            <h1 className="text-3xl font-bold text-center">imagine</h1>
-         </div>
-
-         <div className="flex justify-center gap-4 mb-4">
-            <button
-               onClick={() => handleSwitchMode("classic")}
-               className={`px-4 py-2 rounded ${
-                  mode === "classic" ? "bg-blue-500 text-white" : "bg-gray-200"
-               }`}
-            >
-               Classic
-            </button>
-            <button
-               onClick={() => handleSwitchMode("custom")}
-               className={`px-4 py-2 rounded ${
-                  mode === "custom" ? "bg-blue-500 text-white" : "bg-gray-200"
-               }`}
-            >
-               Custom
-            </button>
-         </div>
-
-         {mode === "classic" && (
-            <div className="mb-4 flex flex-col md:flex-row gap-4">
-               <div>
-                  <label className="block mb-1 font-bold">Kategori:</label>
-                  <select
-                     value={classicCategory}
-                     onChange={(e) => setClassicCategory(e.target.value)}
-                     className="border rounded px-2 py-1"
+      <div className="min-h-screen">
+         {/* Landing Page dengan animasi */}
+         <AnimatePresence>
+            {showLanding && (
+               <motion.div
+                  key="landing"
+                  initial={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -200 }} // swipe up saat hilang
+                  transition={{ duration: 0.8, ease: "easeInOut" }}
+                  className="flex flex-col items-center justify-center h-screen bg-gradient-to-b from-blue-500 to-purple-600 text-white"
+               >
+                  <motion.img
+                     src={logo}
+                     alt="Logo"
+                     className="w-20 h-20 mb-6"
+                     initial={{ scale: 0.8, rotate: 0 }}
+                     animate={{ scale: 1, rotate: 360 }}
+                     transition={{ duration: 1 }}
+                  />
+                  <h1 className="text-4xl font-bold mb-4">Zimagine</h1>
+                  <p className="mb-8 text-lg">
+                     Drag & Drop Tierlist Musik Favoritmu
+                  </p>
+                  <motion.button
+                     whileTap={{ scale: 0.9 }}
+                     whileHover={{ scale: 1.05 }}
+                     onClick={() => setShowLanding(false)}
+                     className="px-6 py-3 bg-white text-blue-600 rounded-lg font-semibold hover:bg-gray-200 transition"
                   >
-                     <option value="band">Band</option>
-                     <option value="music">Musik</option>
-                  </select>
+                     Start
+                  </motion.button>
+               </motion.div>
+            )}
+         </AnimatePresence>
+
+         {/* Main App */}
+         {!showLanding && (
+            <motion.div
+               key="mainapp"
+               initial={{ opacity: 0, scale: 0.9 }}
+               animate={{ opacity: 1, scale: 1 }}
+               transition={{ duration: 0.5 }}
+               className="p-4 max-w-6xl mx-auto"
+            >
+               <div className="flex justify-center items-center py-4">
+                  <img className="w-10 h-10" src={logo} alt="Logo" />
+                  <h1 className="text-3xl font-bold text-center">imagine</h1>
                </div>
 
-               {classicCategory === "music" && (
-                  <div>
-                     <label className="block mb-1 font-bold">
-                        Subkategori:
-                     </label>
-                     <select
-                        value={musicSubcategory}
-                        onChange={(e) => setMusicSubcategory(e.target.value)}
-                        className="border rounded px-2 py-1"
-                     >
-                        {Object.keys(classicData.music).map((sub) => (
-                           <option key={sub} value={sub}>
-                              {sub}
-                           </option>
-                        ))}
-                     </select>
-                  </div>
-               )}
-            </div>
-         )}
-
-         {mode === "custom" && (
-            <div className="mb-4">
-               <h2 className="font-bold mb-2">Masukkan Musik/Band:</h2>
-               <div className="flex gap-2 mb-2">
-                  <input
-                     type="text"
-                     value={customInput}
-                     onChange={(e) => setCustomInput(e.target.value)}
-                     onKeyDown={handleKeyDown}
-                     className="border rounded p-2 w-full"
-                     placeholder="Tambahkan nama band/musik..."
-                  />
+               <div className="flex justify-center gap-4 mb-4">
                   <button
-                     onClick={handleAddCustom}
-                     className="px-4 py-2 bg-blue-500 text-white rounded"
+                     onClick={() => handleSwitchMode("classic")}
+                     className={`px-4 py-2 rounded ${
+                        mode === "classic"
+                           ? "bg-blue-500 text-white"
+                           : "bg-gray-200"
+                     }`}
                   >
-                     Tambah
+                     Classic
+                  </button>
+                  <button
+                     onClick={() => handleSwitchMode("custom")}
+                     className={`px-4 py-2 rounded ${
+                        mode === "custom"
+                           ? "bg-blue-500 text-white"
+                           : "bg-gray-200"
+                     }`}
+                  >
+                     Custom
                   </button>
                </div>
-               {errorMsg && (
-                  <p className="mt-1 text-red-500 text-sm">{errorMsg}</p>
+
+               {mode === "custom" && (
+                  <div className="mb-4">
+                     <h2 className="font-bold mb-2">Masukkan Musik/Band:</h2>
+                     <div className="flex gap-2 mb-2">
+                        <input
+                           type="text"
+                           value={customInput}
+                           onChange={(e) => setCustomInput(e.target.value)}
+                           onKeyDown={handleKeyDown}
+                           className="border rounded p-2 w-full"
+                           placeholder="Tambahkan nama band/musik..."
+                        />
+                        <button
+                           onClick={handleAddCustom}
+                           className="px-4 py-2 bg-blue-500 text-white rounded"
+                        >
+                           Tambah
+                        </button>
+                     </div>
+                     {errorMsg && (
+                        <p className="mt-1 text-red-500 text-sm">{errorMsg}</p>
+                     )}
+                  </div>
                )}
-            </div>
-         )}
 
-         <DragDropContext onDragEnd={handleDragEnd}>
-            <div className="grid grid-cols-1 md:grid-cols-7 gap-4">
-               <GradeColumn grade="pool" items={columns.pool}>
-                  {columns.pool.map((item, index) => (
-                     <ItemCard key={item.id} item={item} index={index} />
-                  ))}
-               </GradeColumn>
+               <DragDropContext onDragEnd={handleDragEnd}>
+                  <div className="grid grid-cols-1 md:grid-cols-7 gap-4">
+                     <GradeColumn grade="pool" items={columns.pool}>
+                        {columns.pool.map((item, index) => (
+                           <ItemCard key={item.id} item={item} index={index} />
+                        ))}
+                     </GradeColumn>
 
-               {grades.map((grade) => (
-                  <GradeColumn key={grade} grade={grade} items={columns[grade]}>
-                     {columns[grade].map((item, index) => (
-                        <ItemCard key={item.id} item={item} index={index} />
+                     {grades.map((grade) => (
+                        <GradeColumn
+                           key={grade}
+                           grade={grade}
+                           items={columns[grade]}
+                        >
+                           {columns[grade].map((item, index) => (
+                              <ItemCard
+                                 key={item.id}
+                                 item={item}
+                                 index={index}
+                              />
+                           ))}
+                        </GradeColumn>
                      ))}
-                  </GradeColumn>
-               ))}
-            </div>
-         </DragDropContext>
+                  </div>
+               </DragDropContext>
+            </motion.div>
+         )}
       </div>
    );
 }
