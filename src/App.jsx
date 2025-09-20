@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { DragDropContext } from "@hello-pangea/dnd";
-import ItemCard from "./components/ItemCard";
 import { classicBands } from "./data";
+import ItemCard from "./components/ItemCard";
+import GradeColumn from "./components/gradecolumn";
 
 const grades = ["S", "A", "B", "C", "D", "E"];
 
