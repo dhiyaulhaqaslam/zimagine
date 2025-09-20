@@ -8,7 +8,9 @@ const grades = ["S", "A", "B", "C", "D", "E"];
 
 export default function App() {
    const [mode, setMode] = useState("classic");
-   const [columns, setColumns] = useState({
+
+   // state terpisah
+   const [classicColumns, setClassicColumns] = useState({
       pool: classicBands,
       S: [],
       A: [],
@@ -18,26 +20,60 @@ export default function App() {
       E: [],
    });
 
-   const [customInput, setCustomInput] = useState("");
-   const [customList, setCustomList] = useState([]);
+   const [customColumns, setCustomColumns] = useState({
+      pool: [],
+      S: [],
+      A: [],
+      B: [],
+      C: [],
+      D: [],
+      E: [],
+   });
 
-   const onDragEnd = (result) => {
-      if (!result.destination) return;
+   const [customInput, setCustomInput] = useState("");
+
+   const handleDragEnd = (result) => {
       const { source, destination } = result;
 
-      const startCol = source.droppableId;
-      const endCol = destination.droppableId;
+      // kalau tidak ada tujuan drop
+      if (!destination) return;
 
-      const startItems = Array.from(columns[startCol]);
-      const [removed] = startItems.splice(source.index, 1);
-      const endItems = Array.from(columns[endCol]);
-      endItems.splice(destination.index, 0, removed);
+      // kalau posisi sumber dan tujuan sama persis, tidak usah ubah state
+      if (
+         source.droppableId === destination.droppableId &&
+         source.index === destination.index
+      ) {
+         return;
+      }
 
-      setColumns({
-         ...columns,
-         [startCol]: startItems,
-         [endCol]: endItems,
-      });
+      const current = mode === "classic" ? classicColumns : customColumns;
+      const setCurrent =
+         mode === "classic" ? setClassicColumns : setCustomColumns;
+
+      // jika drag di kolom yang sama
+      if (source.droppableId === destination.droppableId) {
+         const columnItems = Array.from(current[source.droppableId]);
+         const [moved] = columnItems.splice(source.index, 1);
+         columnItems.splice(destination.index, 0, moved);
+
+         setCurrent({
+            ...current,
+            [source.droppableId]: columnItems,
+         });
+      } else {
+         // drag ke kolom berbeda
+         const startItems = Array.from(current[source.droppableId]);
+         const [moved] = startItems.splice(source.index, 1);
+
+         const endItems = Array.from(current[destination.droppableId]);
+         endItems.splice(destination.index, 0, moved);
+
+         setCurrent({
+            ...current,
+            [source.droppableId]: startItems,
+            [destination.droppableId]: endItems,
+         });
+      }
    };
 
    const handleAddCustom = () => {
@@ -46,22 +82,36 @@ export default function App() {
             id: Date.now().toString(),
             name: customInput.trim(),
          };
-         setCustomList([...customList, newItem]);
+         // langsung update customColumns.pool
+         setCustomColumns({
+            ...customColumns,
+            pool: [...customColumns.pool, newItem],
+         });
          setCustomInput("");
       }
    };
 
-   const startCustom = () => {
-      setColumns({
-         pool: customList,
-         S: [],
-         A: [],
-         B: [],
-         C: [],
-         D: [],
-         E: [],
-      });
+   const handleSwitchMode = (newMode) => {
+      setMode(newMode);
+      if (newMode === "classic") {
+         // reset classic
+         setClassicColumns({
+            pool: classicBands,
+            S: [],
+            A: [],
+            B: [],
+            C: [],
+            D: [],
+            E: [],
+         });
+      }
+      if (newMode === "custom") {
+         // tidak perlu reset custom, biarkan state customColumns seperti terakhir
+      }
    };
+
+   // pilih data sesuai mode
+   const columns = mode === "classic" ? classicColumns : customColumns;
 
    return (
       <div className="p-4 max-w-6xl mx-auto">
@@ -69,18 +119,7 @@ export default function App() {
 
          <div className="flex justify-center gap-4 mb-4">
             <button
-               onClick={() => {
-                  setMode("classic");
-                  setColumns({
-                     pool: classicBands,
-                     S: [],
-                     A: [],
-                     B: [],
-                     C: [],
-                     D: [],
-                     E: [],
-                  });
-               }}
+               onClick={() => handleSwitchMode("classic")}
                className={`px-4 py-2 rounded ${
                   mode === "classic" ? "bg-blue-500 text-white" : "bg-gray-200"
                }`}
@@ -88,7 +127,7 @@ export default function App() {
                Classic
             </button>
             <button
-               onClick={() => setMode("custom")}
+               onClick={() => handleSwitchMode("custom")}
                className={`px-4 py-2 rounded ${
                   mode === "custom" ? "bg-blue-500 text-white" : "bg-gray-200"
                }`}
@@ -114,18 +153,12 @@ export default function App() {
                      Tambah
                   </button>
                </div>
-               <button
-                  onClick={startCustom}
-                  className="bg-blue-500 text-white px-3 py-1 rounded"
-               >
-                  Mulai Custom Mode
-               </button>
             </div>
          )}
 
-         <DragDropContext onDragEnd={onDragEnd}>
+         <DragDropContext onDragEnd={handleDragEnd}>
             <div className="grid grid-cols-1 md:grid-cols-7 gap-4">
-               <GradeColumn grade="Pool" items={columns.pool}>
+               <GradeColumn grade="pool" items={columns.pool}>
                   {columns.pool.map((item, index) => (
                      <ItemCard key={item.id} item={item} index={index} />
                   ))}
