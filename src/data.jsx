@@ -27,8 +27,8 @@ export const classicData = {
          { id: "m6", name: "Peace Sells" },
       ],
       "death metal": [
-        { id: "m7", name: "Hammer Smashed Face" },
-        { id: "m8", name: "Wtf Is Going On??" }
+         { id: "m7", name: "Hammer Smashed Face" },
+         { id: "m8", name: "Wtf Is Going On??" },
       ],
       "black metal": [{ id: "m9", name: "Freezing Moon" }],
       pop: [{ id: "m10", name: "Shape of You" }],
@@ -37,6 +37,13 @@ export const classicData = {
       "r&b": [{ id: "m13", name: "Blinding Lights" }],
       country: [{ id: "m14", name: "Take Me Home, Country Roads" }],
       "hip hop": [{ id: "m15", name: "Lose Yourself" }],
-      kpop: [{ id: "m16", name: "Dynamite" }],
+      kpop: [
+         { id: "m16", name: "Dynamite" },
+         { id: "m17", name: "DNA" },
+         { id: "m18", name: "Fake Love" },
+         { id: "m19", name: "Mic Drop" },
+         { id: "m20", name: "Save Me" },
+         { id: "m20", name: "Boy In Luv" },
+      ],
    },
 };
