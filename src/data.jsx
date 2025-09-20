@@ -43,7 +43,7 @@ export const classicData = {
          { id: "m18", name: "Fake Love" },
          { id: "m19", name: "Mic Drop" },
          { id: "m20", name: "Save Me" },
-         { id: "m20", name: "Boy In Luv" },
+         { id: "m21", name: "Boy In Luv" },
       ],
    },
 };

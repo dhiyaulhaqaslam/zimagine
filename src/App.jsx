@@ -65,40 +65,67 @@ export default function App() {
 
    const handleDragEnd = (result) => {
       const { source, destination } = result;
-      if (!destination) return;
+      if (!destination) return; // kalau tidak ada tujuan, keluar
+
+      // kalau source dan destination sama persis, jangan ubah state
       if (
          source.droppableId === destination.droppableId &&
          source.index === destination.index
-      )
+      ) {
          return;
+      }
 
-      const current = mode === "classic" ? classicColumns : customColumns;
-      const setCurrent =
-         mode === "classic" ? setClassicColumns : setCustomColumns;
+      // pilih state sesuai mode
+      if (mode === "classic") {
+         setClassicColumns((prev) => {
+            const startCol = source.droppableId;
+            const endCol = destination.droppableId;
 
-      if (source.droppableId === destination.droppableId) {
-         const columnItems = Array.from(current[source.droppableId]);
-         const [moved] = columnItems.splice(source.index, 1);
-         columnItems.splice(destination.index, 0, moved);
+            const startItems = Array.from(prev[startCol]);
+            const [removed] = startItems.splice(source.index, 1);
 
-         setCurrent({
-            ...current,
-            [source.droppableId]: columnItems,
+            const endItems =
+               startCol === endCol
+                  ? startItems // kalau sama kolomnya, kita pakai startItems saja
+                  : Array.from(prev[endCol]);
+
+            if (startCol !== endCol) {
+               endItems.splice(destination.index, 0, removed);
+            } else {
+               startItems.splice(destination.index, 0, removed);
+            }
+
+            return {
+               ...prev,
+               [startCol]: startItems,
+               [endCol]: endItems,
+            };
          });
       } else {
-         const startItems = Array.from(current[source.droppableId]);
-         const [moved] = startItems.splice(source.index, 1);
-         const endItems = Array.from(current[destination.droppableId]);
-         endItems.splice(destination.index, 0, moved);
+         setCustomColumns((prev) => {
+            const startCol = source.droppableId;
+            const endCol = destination.droppableId;
 
-         setCurrent({
-            ...current,
-            [source.droppableId]: startItems,
-            [destination.droppableId]: endItems,
+            const startItems = Array.from(prev[startCol]);
+            const [removed] = startItems.splice(source.index, 1);
+
+            const endItems =
+               startCol === endCol ? startItems : Array.from(prev[endCol]);
+
+            if (startCol !== endCol) {
+               endItems.splice(destination.index, 0, removed);
+            } else {
+               startItems.splice(destination.index, 0, removed);
+            }
+
+            return {
+               ...prev,
+               [startCol]: startItems,
+               [endCol]: endItems,
+            };
          });
       }
    };
-
    const handleAddCustom = () => {
       const newName = customInput.trim();
       if (newName === "") return;
