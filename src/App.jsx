@@ -3,6 +3,7 @@ import { DragDropContext } from "@hello-pangea/dnd";
 import GradeColumn from "./components/GradeColumn";
 import ItemCard from "./components/ItemCard";
 import { classicData } from "./data";
+import logo from './assets/logo.png';
 
 const grades = ["S", "A", "B", "C", "D", "E"];
 
@@ -191,7 +192,7 @@ export default function App() {
    return (
       <div className="p-4 max-w-6xl mx-auto">
          <div className="flex justify-center items-center py-4">
-            <img className="w-10 h-10" src="src/assets/logo.png" alt="" />
+            <img className="w-10 h-10" src={logo} alt="Logo" />
             <h1 className="text-3xl font-bold text-center">imagine</h1>
          </div>
 
