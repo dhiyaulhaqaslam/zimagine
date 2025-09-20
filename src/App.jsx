@@ -190,7 +190,10 @@ export default function App() {
 
    return (
       <div className="p-4 max-w-6xl mx-auto">
-         <h1 className="text-3xl font-bold text-center mb-4">Zimagine</h1>
+         <div className="flex justify-center items-center py-4">
+            <img className="w-10 h-10" src="src/assets/logo.png" alt="" />
+            <h1 className="text-3xl font-bold text-center">imagine</h1>
+         </div>
 
          <div className="flex justify-center gap-4 mb-4">
             <button
