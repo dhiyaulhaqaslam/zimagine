@@ -3,12 +3,13 @@ import { DragDropContext } from "@hello-pangea/dnd";
 import GradeColumn from "./components/GradeColumn";
 import ItemCard from "./components/ItemCard";
 import { classicData } from "./data";
-import logo from './assets/logo.png';
+import logo from "./assets/logo.png";
 
 const grades = ["S", "A", "B", "C", "D", "E"];
 
 export default function App() {
    const [mode, setMode] = useState("classic");
+   const [showLanding, setShowLanding] = useState(true);
 
    // classic category/subcategory state
    const [classicCategory, setClassicCategory] = useState("band");
@@ -188,6 +189,22 @@ export default function App() {
    };
 
    const columns = mode === "classic" ? classicColumns : customColumns;
+
+   if (showLanding) {
+      return (
+         <div className="flex flex-col items-center justify-center h-screen bg-gradient-to-b from-blue-500 to-purple-600 text-white">
+            <img src={logo} alt="Logo" className="w-20 h-20 mb-6" />
+            <h1 className="text-4xl font-bold mb-4">Zimagine</h1>
+            <p className="mb-8 text-lg">Drag & Drop Tierlist Musik Favoritmu</p>
+            <button
+               onClick={() => setShowLanding(false)}
+               className="px-6 py-3 bg-white text-blue-600 rounded-lg font-semibold hover:bg-gray-200 transition"
+            >
+               Start
+            </button>
+         </div>
+      );
+   }
 
    return (
       <div className="p-4 max-w-6xl mx-auto">
