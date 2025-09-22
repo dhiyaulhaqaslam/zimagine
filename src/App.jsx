@@ -11,7 +11,7 @@ const grades = ["S", "A", "B", "C", "D", "E"];
 export default function App() {
    const [mode, setMode] = useState("classic");
    const [showLanding, setShowLanding] = useState(true);
-   const [showModeSelect, setShowModeSelect] = useState(false); // ⬅️ TAMBAH
+   const [showModeSelect, setShowModeSelect] = useState(false);
 
    // classic category/subcategory state
    const [classicCategory, setClassicCategory] = useState("band");
@@ -69,7 +69,6 @@ export default function App() {
    const handleDragEnd = (result) => {
       const { source, destination } = result;
       if (!destination) return;
-
       if (
          source.droppableId === destination.droppableId &&
          source.index === destination.index
@@ -160,7 +159,7 @@ export default function App() {
 
    const handleChooseMode = (chosenMode) => {
       setMode(chosenMode);
-      setShowModeSelect(false); // ⬅️ hilangkan mode select
+      setShowModeSelect(false); // ke game
    };
 
    const columns = mode === "classic" ? classicColumns : customColumns;
@@ -194,7 +193,7 @@ export default function App() {
                      whileHover={{ scale: 1.05 }}
                      onClick={() => {
                         setShowLanding(false);
-                        setShowModeSelect(true); // ⬅️ setelah landing → pilih mode
+                        setShowModeSelect(true);
                      }}
                      className="px-6 py-3 bg-white text-blue-600 rounded-lg font-semibold hover:bg-gray-200 transition"
                   >
@@ -215,6 +214,15 @@ export default function App() {
                   transition={{ duration: 0.5 }}
                   className="flex flex-col items-center justify-center h-screen bg-gradient-to-b from-purple-600 to-blue-500 text-white"
                >
+                  <button
+                     onClick={() => {
+                        setShowModeSelect(false);
+                        setShowLanding(true);
+                     }}
+                     className="absolute top-4 left-4 px-4 py-2 bg-white text-blue-600 rounded hover:bg-gray-200"
+                  >
+                     ← Back
+                  </button>
                   <h2 className="text-3xl font-bold mb-6">Pilih Mode</h2>
                   <div className="flex gap-6">
                      <motion.button
@@ -247,9 +255,18 @@ export default function App() {
                transition={{ duration: 0.5 }}
                className="p-4 max-w-6xl mx-auto"
             >
-               <div className="flex justify-center items-center py-4">
-                  <img className="w-10 h-10" src={logo} alt="Logo" />
-                  <h1 className="text-3xl font-bold text-center">imagine</h1>
+               {/* Tombol Back */}
+               <div className="flex justify-between items-center mb-4">
+                  <button
+                     onClick={() => setShowModeSelect(true)}
+                     className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300"
+                  >
+                     ← Back
+                  </button>
+                  <div className="flex items-center gap-2">
+                     <img className="w-10 h-10" src={logo} alt="Logo" />
+                     <h1 className="text-3xl font-bold text-center">imagine</h1>
+                  </div>
                </div>
 
                {mode === "custom" && (
