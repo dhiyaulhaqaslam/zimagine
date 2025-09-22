@@ -4,9 +4,7 @@ import GradeColumn from "./components/GradeColumn";
 import ItemCard from "./components/ItemCard";
 import { classicData } from "./data";
 import logo from "./assets/logo.png";
-import useAudioBuffer from "./hooks/useAudioBuffer";
-import DiscordJoin from "./assets/DiscordJoin.mp3";
-import DiscordLeave from "./assets/DiscordLeave.mp3";
+import Metallica from "./assets/Metallica.mp3"; // <-- audio file
 import { motion, AnimatePresence } from "framer-motion";
 
 const grades = ["S", "A", "B", "C", "D", "E"];
@@ -19,8 +17,8 @@ export default function App() {
    const [classicCategory, setClassicCategory] = useState("band");
    const [musicSubcategory, setMusicSubcategory] = useState("rock");
 
-   const playJoin = useAudioBuffer(DiscordJoin);
-   const playLeave = useAudioBuffer(DiscordLeave);
+   // Audio ref
+   const audioRef = useRef(null);
 
    const [classicColumns, setClassicColumns] = useState({
       pool: classicData.band,
@@ -163,7 +161,6 @@ export default function App() {
    };
 
    const handleChooseMode = (chosenMode) => {
-      playJoin();
       setMode(chosenMode);
       setShowModeSelect(false); // ke game
    };
@@ -172,6 +169,9 @@ export default function App() {
 
    return (
       <div className="min-h-screen">
+         {/* Audio tag */}
+         <audio ref={audioRef} src={metallica} />
+
          {/* Landing */}
          <AnimatePresence>
             {showLanding && (
@@ -198,7 +198,11 @@ export default function App() {
                      whileTap={{ scale: 0.9 }}
                      whileHover={{ scale: 1.05 }}
                      onClick={() => {
-                        playJoin();
+                        // play music
+                        if (audioRef.current) {
+                           audioRef.current.currentTime = 0;
+                           audioRef.current.play();
+                        }
                         setShowLanding(false);
                         setShowModeSelect(true);
                      }}
@@ -223,7 +227,6 @@ export default function App() {
                >
                   <button
                      onClick={() => {
-                        playLeave();
                         setShowModeSelect(false);
                         setShowLanding(true);
                      }}
@@ -267,7 +270,6 @@ export default function App() {
                <div className="flex justify-between items-center mb-4">
                   <button
                      onClick={() => {
-                        playLeave();
                         setShowModeSelect(true);
                      }}
                      className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300"
