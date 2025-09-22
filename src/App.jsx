@@ -170,7 +170,7 @@ export default function App() {
    return (
       <div className="min-h-screen">
          {/* Audio tag */}
-         <audio ref={audioRef} src={metallica} />
+         <audio ref={audioRef} src={Metallica} />
 
          {/* Landing */}
          <AnimatePresence>
@@ -201,6 +201,7 @@ export default function App() {
                         // play music
                         if (audioRef.current) {
                            audioRef.current.currentTime = 0;
+                           audioRef.current.volume = 0.3;
                            audioRef.current.play();
                         }
                         setShowLanding(false);
