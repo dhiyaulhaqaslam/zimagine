@@ -1,4 +1,5 @@
 import { Draggable } from "@hello-pangea/dnd";
+import { gradeColors } from "../App";
 
 export default function ItemCard({ item, index }) {
    return (
