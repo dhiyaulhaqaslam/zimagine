@@ -10,7 +10,13 @@ export default function ItemCard({ item, index }) {
                ref={provided.innerRef}
                className="p-2 rounded text-center font-medium shadow"
                style={{
-                  backgroundColor: item.color || "#FFFFFF", // warna ikut grade
+                  backgroundColor: item.color || "#FFFFFF",
+                  color:
+                     item.color &&
+                     item.color !== "#FFFFFF" &&
+                     item.color !== gradeColors.S // kuning terang
+                        ? "#FFFFFF"
+                        : "#000000",
                   ...provided.draggableProps.style,
                }}
             >

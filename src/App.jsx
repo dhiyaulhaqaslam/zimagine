@@ -9,14 +9,14 @@ import TheBeatles from "./assets/TheBeatles.mp3";
 import Disturbed from "./assets/Disturbed.mp3";
 import { motion, AnimatePresence } from "framer-motion";
 
-const gradeColors = {
+export const gradeColors = {
    S: "#FFD700",
    A: "#28A745",
    B: "#007BFF",
    C: "#8A2BE2",
    D: "#FFA500",
    E: "#DC3545",
-   pool: "#FFFFFF",
+   pool: "#E5E7EB", // gray-200 untuk pool
 };
 
 const grades = ["S", "A", "B", "C", "D", "E"];
