@@ -20,6 +20,29 @@ export default function App() {
    // Audio ref
    const audioRef = useRef(null);
 
+   const playWithFadeIn = () => {
+      if (audioRef.current) {
+         audioRef.current.volume = 0.1; // volume awal
+         audioRef.current.play();
+
+         let currentVolume = 0.01;
+         const targetVolume = 0.6; // volume akhir
+         const step = 0.01; // besar kenaikan tiap step
+         const intervalTime = 300; // tiap 200ms naik step
+
+         const fadeInterval = setInterval(() => {
+            currentVolume += step;
+            if (currentVolume >= targetVolume) {
+               currentVolume = targetVolume;
+               clearInterval(fadeInterval);
+            }
+            audioRef.current.volume = currentVolume;
+         }, intervalTime);
+      }
+   };
+
+   // Audio ref
+
    const [classicColumns, setClassicColumns] = useState({
       pool: classicData.band,
       S: [],
@@ -170,7 +193,7 @@ export default function App() {
    return (
       <div className="min-h-screen">
          {/* Audio tag */}
-         <audio ref={audioRef} src={Metallica} />
+         <audio ref={audioRef} src={Metallica} preload="auto" />
 
          {/* Landing */}
          <AnimatePresence>
@@ -198,12 +221,7 @@ export default function App() {
                      whileTap={{ scale: 0.9 }}
                      whileHover={{ scale: 1.05 }}
                      onClick={() => {
-                        // play music
-                        if (audioRef.current) {
-                           audioRef.current.currentTime = 0;
-                           audioRef.current.volume = 0.3;
-                           audioRef.current.play();
-                        }
+                        playWithFadeIn();
                         setShowLanding(false);
                         setShowModeSelect(true);
                      }}
