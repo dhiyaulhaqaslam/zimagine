@@ -1,9 +1,10 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { DragDropContext } from "@hello-pangea/dnd";
 import GradeColumn from "./components/GradeColumn";
 import ItemCard from "./components/ItemCard";
 import { classicData } from "./data";
 import logo from "./assets/logo.png";
+import Ding2 from "./assets/Ding2.mp3";
 import { motion, AnimatePresence } from "framer-motion";
 
 const grades = ["S", "A", "B", "C", "D", "E"];
@@ -13,7 +14,6 @@ export default function App() {
    const [showLanding, setShowLanding] = useState(true);
    const [showModeSelect, setShowModeSelect] = useState(false);
 
-   // classic category/subcategory state
    const [classicCategory, setClassicCategory] = useState("band");
    const [musicSubcategory, setMusicSubcategory] = useState("rock");
 
@@ -39,6 +39,15 @@ export default function App() {
 
    const [customInput, setCustomInput] = useState("");
    const [errorMsg, setErrorMsg] = useState("");
+
+   // audio klik
+   const audioRef = useRef(null);
+   const playClick = () => {
+      if (audioRef.current) {
+         audioRef.current.currentTime = 0;
+         audioRef.current.play();
+      }
+   };
 
    useEffect(() => {
       if (mode === "classic") {
@@ -126,6 +135,7 @@ export default function App() {
    };
 
    const handleAddCustom = () => {
+      playClick();
       const newName = customInput.trim();
       if (newName === "") return;
 
@@ -158,6 +168,7 @@ export default function App() {
    };
 
    const handleChooseMode = (chosenMode) => {
+      playClick();
       setMode(chosenMode);
       setShowModeSelect(false); // ke game
    };
@@ -166,6 +177,8 @@ export default function App() {
 
    return (
       <div className="min-h-screen">
+         <audio ref={audioRef} src={Ding2} />
+
          {/* Landing */}
          <AnimatePresence>
             {showLanding && (
@@ -192,6 +205,7 @@ export default function App() {
                      whileTap={{ scale: 0.9 }}
                      whileHover={{ scale: 1.05 }}
                      onClick={() => {
+                        playClick();
                         setShowLanding(false);
                         setShowModeSelect(true);
                      }}
@@ -212,10 +226,11 @@ export default function App() {
                   animate={{ opacity: 1, scale: 1, y: 0 }}
                   exit={{ opacity: 0, scale: 0.8, y: -50 }}
                   transition={{ duration: 0.5 }}
-                  className="flex flex-col items-center justify-center h-screen bg-gradient-to-b from-purple-600 to-blue-500 text-white"
+                  className="flex flex-col items-center justify-center h-screen bg-gradient-to-b from-purple-600 to-blue-500 text-white relative"
                >
                   <button
                      onClick={() => {
+                        playClick();
                         setShowModeSelect(false);
                         setShowLanding(true);
                      }}
@@ -253,19 +268,25 @@ export default function App() {
                initial={{ opacity: 0, y: 50 }}
                animate={{ opacity: 1, y: 0 }}
                transition={{ duration: 0.7 }}
-               className="p-4 max-w-6xl mx-auto bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 rounded-xl shadow-xl"
+               // background meriah 🎵🎶
+               className="p-4 max-w-6xl mx-auto rounded-xl shadow-xl bg-[url('https://twemoji.maxcdn.com/v/latest/svg/1f3b5.svg')] bg-no-repeat bg-right-bottom bg-[length:80px_80px] bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50"
             >
                {/* Tombol Back */}
                <div className="flex justify-between items-center mb-4">
                   <button
-                     onClick={() => setShowModeSelect(true)}
+                     onClick={() => {
+                        playClick();
+                        setShowModeSelect(true);
+                     }}
                      className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300"
                   >
                      ← Back
                   </button>
                   <div className="flex items-center">
                      <img className="w-10 h-10" src={logo} alt="Logo" />
-                     <h1 className="text-3xl font-bold text-center">imagine</h1>
+                     <h1 className="text-3xl font-bold text-center ml-2">
+                        imagine
+                     </h1>
                   </div>
                </div>
 
