@@ -26,7 +26,7 @@ export default function App() {
          audioRef.current.play();
 
          let currentVolume = 0.01;
-         const targetVolume = 0.6; // volume akhir
+         const targetVolume = 1; // volume akhir
          const step = 0.01; // besar kenaikan tiap step
          const intervalTime = 300; // tiap 200ms naik step
 
