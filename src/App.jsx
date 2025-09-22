@@ -4,7 +4,7 @@ import GradeColumn from "./components/GradeColumn";
 import ItemCard from "./components/ItemCard";
 import { classicData } from "./data";
 import logo from "./assets/logo.png";
-import Metallica from "./assets/Metallica.mp3"; // <-- audio file
+import Metallica from "./assets/Metallica.mp3";
 import { motion, AnimatePresence } from "framer-motion";
 
 const grades = ["S", "A", "B", "C", "D", "E"];
@@ -17,18 +17,24 @@ export default function App() {
    const [classicCategory, setClassicCategory] = useState("band");
    const [musicSubcategory, setMusicSubcategory] = useState("rock");
 
-   // Audio ref
+   // Audio
    const audioRef = useRef(null);
 
+   const [volume, setVolume] = useState(0.3); // default volume
+   const [muted, setMuted] = useState(false);
+   const [showSettings, setShowSettings] = useState(false);
+
+   // jalankan fade-in saat start
    const playWithFadeIn = () => {
       if (audioRef.current) {
-         audioRef.current.volume = 0.1; // volume awal
+         audioRef.current.muted = muted;
+         audioRef.current.volume = 0.1;
          audioRef.current.play();
 
-         let currentVolume = 0.00005;
-         const targetVolume = 1; // volume akhir
-         const step = 0.002; // besar kenaikan tiap step
-         const intervalTime = 400; // tiap 200ms naik step
+         let currentVolume = 0.1;
+         const targetVolume = volume; // gunakan state volume
+         const step = 0.02;
+         const intervalTime = 200;
 
          const fadeInterval = setInterval(() => {
             currentVolume += step;
@@ -41,8 +47,15 @@ export default function App() {
       }
    };
 
-   // Audio ref
+   // update volume dan mute realtime
+   useEffect(() => {
+      if (audioRef.current) {
+         audioRef.current.volume = volume;
+         audioRef.current.muted = muted;
+      }
+   }, [volume, muted]);
 
+   // Columns state
    const [classicColumns, setClassicColumns] = useState({
       pool: classicData.band,
       S: [],
@@ -102,53 +115,31 @@ export default function App() {
          return;
       }
 
-      if (mode === "classic") {
-         setClassicColumns((prev) => {
-            const startCol = source.droppableId;
-            const endCol = destination.droppableId;
+      const setColumns =
+         mode === "classic" ? setClassicColumns : setCustomColumns;
 
-            const startItems = Array.from(prev[startCol]);
-            const [removed] = startItems.splice(source.index, 1);
+      setColumns((prev) => {
+         const startCol = source.droppableId;
+         const endCol = destination.droppableId;
 
-            const endItems =
-               startCol === endCol ? startItems : Array.from(prev[endCol]);
+         const startItems = Array.from(prev[startCol]);
+         const [removed] = startItems.splice(source.index, 1);
 
-            if (startCol !== endCol) {
-               endItems.splice(destination.index, 0, removed);
-            } else {
-               startItems.splice(destination.index, 0, removed);
-            }
+         const endItems =
+            startCol === endCol ? startItems : Array.from(prev[endCol]);
 
-            return {
-               ...prev,
-               [startCol]: startItems,
-               [endCol]: endItems,
-            };
-         });
-      } else {
-         setCustomColumns((prev) => {
-            const startCol = source.droppableId;
-            const endCol = destination.droppableId;
+         if (startCol !== endCol) {
+            endItems.splice(destination.index, 0, removed);
+         } else {
+            startItems.splice(destination.index, 0, removed);
+         }
 
-            const startItems = Array.from(prev[startCol]);
-            const [removed] = startItems.splice(source.index, 1);
-
-            const endItems =
-               startCol === endCol ? startItems : Array.from(prev[endCol]);
-
-            if (startCol !== endCol) {
-               endItems.splice(destination.index, 0, removed);
-            } else {
-               startItems.splice(destination.index, 0, removed);
-            }
-
-            return {
-               ...prev,
-               [startCol]: startItems,
-               [endCol]: endItems,
-            };
-         });
-      }
+         return {
+            ...prev,
+            [startCol]: startItems,
+            [endCol]: endItems,
+         };
+      });
    };
 
    const handleAddCustom = () => {
@@ -185,14 +176,13 @@ export default function App() {
 
    const handleChooseMode = (chosenMode) => {
       setMode(chosenMode);
-      setShowModeSelect(false); // ke game
+      setShowModeSelect(false);
    };
 
    const columns = mode === "classic" ? classicColumns : customColumns;
 
    return (
       <div className="min-h-screen">
-         {/* Audio tag */}
          <audio ref={audioRef} src={Metallica} preload="auto" />
 
          {/* Landing */}
@@ -285,24 +275,69 @@ export default function App() {
                transition={{ duration: 0.7 }}
                className="p-4 max-w-6xl mx-auto rounded-xl shadow-xl bg-[url('https://twemoji.maxcdn.com/v/latest/svg/1f3b5.svg')] bg-no-repeat bg-right-bottom bg-[length:80px_80px] bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50"
             >
-               {/* Tombol Back */}
+               {/* Header */}
                <div className="flex justify-between items-center mb-4">
                   <button
-                     onClick={() => {
-                        setShowModeSelect(true);
-                     }}
+                     onClick={() => setShowModeSelect(true)}
                      className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300"
                   >
                      ← Back
                   </button>
+
                   <div className="flex items-center">
                      <img className="w-10 h-10" src={logo} alt="Logo" />
                      <h1 className="text-3xl font-bold text-center ml-2">
                         imagine
                      </h1>
                   </div>
+
+                  <button
+                     onClick={() => setShowSettings(true)}
+                     className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                  >
+                     ⚙️ Settings
+                  </button>
                </div>
 
+               {/* Settings modal */}
+               {showSettings && (
+                  <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+                     <div className="bg-white p-6 rounded-lg shadow-lg w-80">
+                        <h3 className="text-xl font-bold mb-4">
+                           Pengaturan Musik
+                        </h3>
+                        <label className="block mb-2">
+                           Volume: {Math.round(volume * 100)}%
+                        </label>
+                        <input
+                           type="range"
+                           min="0"
+                           max="1"
+                           step="0.01"
+                           value={volume}
+                           onChange={(e) => setVolume(Number(e.target.value))}
+                           className="w-full mb-4"
+                        />
+                        <div className="flex items-center mb-4">
+                           <input
+                              type="checkbox"
+                              checked={muted}
+                              onChange={(e) => setMuted(e.target.checked)}
+                              className="mr-2"
+                           />
+                           <span>Mute Musik</span>
+                        </div>
+                        <button
+                           onClick={() => setShowSettings(false)}
+                           className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 w-full"
+                        >
+                           Tutup
+                        </button>
+                     </div>
+                  </div>
+               )}
+
+               {/* Input custom */}
                {mode === "custom" && (
                   <div className="mb-4">
                      <h2 className="font-bold mb-2">Masukkan Musik/Band:</h2>
@@ -328,6 +363,7 @@ export default function App() {
                   </div>
                )}
 
+               {/* Drag Drop */}
                <DragDropContext onDragEnd={handleDragEnd}>
                   <div className="grid grid-cols-1 md:grid-cols-7 gap-4">
                      <GradeColumn grade="pool" items={columns.pool}>
