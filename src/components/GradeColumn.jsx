@@ -1,19 +1,22 @@
 import { Droppable } from "@hello-pangea/dnd";
 
 export default function GradeColumn({ grade, items, children }) {
+   // hanya warna untuk header kolom
    const gradeColors = {
-      S: "bg-gradient-to-br from-yellow-400 to-yellow-600 text-black", // mewah
+      S: "bg-gradient-to-br from-yellow-400 to-yellow-600 text-black",
       A: "bg-green-500 text-white",
       B: "bg-blue-500 text-white",
       C: "bg-purple-500 text-white",
       D: "bg-orange-500 text-white",
-      E: "bg-red-600 text-white", // paling bawah
+      E: "bg-red-600 text-white",
+      pool: "bg-gray-200 text-black",
    };
+
    return (
       <div className="flex flex-col">
          <h3
             className={`text-center font-bold py-2 rounded-t ${
-               gradeColors[grade] || "bg-gray-200"
+               gradeColors[grade] || gradeColors.pool
             }`}
          >
             {grade.toUpperCase()}

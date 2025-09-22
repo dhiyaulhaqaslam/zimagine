@@ -10,13 +10,13 @@ import Disturbed from "./assets/Disturbed.mp3";
 import { motion, AnimatePresence } from "framer-motion";
 
 const gradeColors = {
-   S: "#FFD700", // Gold
-   A: "#C0C0C0", // Silver
-   B: "#CD7F32", // Bronze
-   C: "#90EE90", // LightGreen
-   D: "#87CEFA", // LightBlue
-   E: "#FFB6C1", // LightPink
-   pool: "#FFFFFF", // default putih
+   S: "#FFD700",
+   A: "#28A745",
+   B: "#007BFF",
+   C: "#8A2BE2",
+   D: "#FFA500",
+   E: "#DC3545",
+   pool: "#FFFFFF",
 };
 
 const grades = ["S", "A", "B", "C", "D", "E"];
