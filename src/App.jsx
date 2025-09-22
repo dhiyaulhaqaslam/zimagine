@@ -4,7 +4,8 @@ import GradeColumn from "./components/GradeColumn";
 import ItemCard from "./components/ItemCard";
 import { classicData } from "./data";
 import logo from "./assets/logo.png";
-import Ding2 from "./assets/Ding2.mp3";
+import DiscordJoin from "./assets/DiscordJoin.mp3";
+import DiscordLeave from "./assets/DiscordLeave.mp3";
 import { motion, AnimatePresence } from "framer-motion";
 
 const grades = ["S", "A", "B", "C", "D", "E"];
@@ -40,12 +41,20 @@ export default function App() {
    const [customInput, setCustomInput] = useState("");
    const [errorMsg, setErrorMsg] = useState("");
 
-   // audio klik
-   const audioRef = useRef(null);
-   const playClick = () => {
-      if (audioRef.current) {
-         audioRef.current.currentTime = 0;
-         audioRef.current.play();
+   // audio refs
+   const joinRef = useRef(null);
+   const leaveRef = useRef(null);
+
+   const playJoin = () => {
+      if (joinRef.current) {
+         joinRef.current.currentTime = 0;
+         joinRef.current.play();
+      }
+   };
+   const playLeave = () => {
+      if (leaveRef.current) {
+         leaveRef.current.currentTime = 0;
+         leaveRef.current.play();
       }
    };
 
@@ -135,7 +144,6 @@ export default function App() {
    };
 
    const handleAddCustom = () => {
-      playClick();
       const newName = customInput.trim();
       if (newName === "") return;
 
@@ -168,7 +176,7 @@ export default function App() {
    };
 
    const handleChooseMode = (chosenMode) => {
-      playClick();
+      playJoin();
       setMode(chosenMode);
       setShowModeSelect(false); // ke game
    };
@@ -177,7 +185,8 @@ export default function App() {
 
    return (
       <div className="min-h-screen">
-         <audio ref={audioRef} src={Ding2} />
+         <audio ref={joinRef} src={DiscordJoin} />
+         <audio ref={leaveRef} src={DiscordLeave} />
 
          {/* Landing */}
          <AnimatePresence>
@@ -205,7 +214,7 @@ export default function App() {
                      whileTap={{ scale: 0.9 }}
                      whileHover={{ scale: 1.05 }}
                      onClick={() => {
-                        playClick();
+                        playJoin();
                         setShowLanding(false);
                         setShowModeSelect(true);
                      }}
@@ -230,7 +239,7 @@ export default function App() {
                >
                   <button
                      onClick={() => {
-                        playClick();
+                        playLeave();
                         setShowModeSelect(false);
                         setShowLanding(true);
                      }}
@@ -268,14 +277,13 @@ export default function App() {
                initial={{ opacity: 0, y: 50 }}
                animate={{ opacity: 1, y: 0 }}
                transition={{ duration: 0.7 }}
-               // background meriah 🎵🎶
                className="p-4 max-w-6xl mx-auto rounded-xl shadow-xl bg-[url('https://twemoji.maxcdn.com/v/latest/svg/1f3b5.svg')] bg-no-repeat bg-right-bottom bg-[length:80px_80px] bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50"
             >
                {/* Tombol Back */}
                <div className="flex justify-between items-center mb-4">
                   <button
                      onClick={() => {
-                        playClick();
+                        playLeave();
                         setShowModeSelect(true);
                      }}
                      className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300"
