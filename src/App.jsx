@@ -9,6 +9,16 @@ import TheBeatles from "./assets/TheBeatles.mp3";
 import Disturbed from "./assets/Disturbed.mp3";
 import { motion, AnimatePresence } from "framer-motion";
 
+const gradeColors = {
+   S: "#FFD700", // Gold
+   A: "#C0C0C0", // Silver
+   B: "#CD7F32", // Bronze
+   C: "#90EE90", // LightGreen
+   D: "#87CEFA", // LightBlue
+   E: "#FFB6C1", // LightPink
+   pool: "#FFFFFF", // default putih
+};
+
 const grades = ["S", "A", "B", "C", "D", "E"];
 
 export default function App() {
@@ -146,6 +156,9 @@ export default function App() {
          const startItems = Array.from(prev[startCol]);
          const [removed] = startItems.splice(source.index, 1);
 
+         // tambahkan color sesuai endCol
+         removed.color = gradeColors[endCol] || "#FFFFFF";
+
          const endItems =
             startCol === endCol ? startItems : Array.from(prev[endCol]);
 
@@ -162,7 +175,6 @@ export default function App() {
          };
       });
    };
-
    const handleAddCustom = () => {
       const newName = customInput.trim();
       if (newName === "") return;
@@ -307,9 +319,7 @@ export default function App() {
 
                   <div className="flex items-center">
                      <img className="w-10 h-10" src={logo} alt="Logo" />
-                     <h1 className="text-3xl font-bold text-center">
-                        imagine
-                     </h1>
+                     <h1 className="text-3xl font-bold text-center">imagine</h1>
                   </div>
 
                   <button

@@ -5,10 +5,14 @@ export default function ItemCard({ item, index }) {
       <Draggable draggableId={item.id} index={index}>
          {(provided) => (
             <div
-               ref={provided.innerRef}
                {...provided.draggableProps}
                {...provided.dragHandleProps}
-               className="bg-white p-2 rounded shadow cursor-move text-center"
+               ref={provided.innerRef}
+               className="p-2 rounded text-center font-medium shadow"
+               style={{
+                  backgroundColor: item.color || "#FFFFFF", // warna ikut grade
+                  ...provided.draggableProps.style,
+               }}
             >
                {item.name}
             </div>
