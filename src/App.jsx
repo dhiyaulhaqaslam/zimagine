@@ -250,10 +250,10 @@ export default function App() {
          {!showLanding && !showModeSelect && (
             <motion.div
                key="mainapp"
-               initial={{ opacity: 0, scale: 0.9 }}
-               animate={{ opacity: 1, scale: 1 }}
-               transition={{ duration: 0.5 }}
-               className="p-4 max-w-6xl mx-auto"
+               initial={{ opacity: 0, y: 50 }}
+               animate={{ opacity: 1, y: 0 }}
+               transition={{ duration: 0.7 }}
+               className="p-4 max-w-6xl mx-auto bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 rounded-xl shadow-xl"
             >
                {/* Tombol Back */}
                <div className="flex justify-between items-center mb-4">
