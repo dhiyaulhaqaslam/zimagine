@@ -11,6 +11,7 @@ const grades = ["S", "A", "B", "C", "D", "E"];
 export default function App() {
    const [mode, setMode] = useState("classic");
    const [showLanding, setShowLanding] = useState(true);
+   const [showModeSelect, setShowModeSelect] = useState(false); // ⬅️ TAMBAH
 
    // classic category/subcategory state
    const [classicCategory, setClassicCategory] = useState("band");
@@ -39,7 +40,6 @@ export default function App() {
    const [customInput, setCustomInput] = useState("");
    const [errorMsg, setErrorMsg] = useState("");
 
-   // update pool otomatis saat category/subcategory berubah
    useEffect(() => {
       if (mode === "classic") {
          if (classicCategory === "band") {
@@ -68,9 +68,8 @@ export default function App() {
 
    const handleDragEnd = (result) => {
       const { source, destination } = result;
-      if (!destination) return; // kalau tidak ada tujuan, keluar
+      if (!destination) return;
 
-      // kalau source dan destination sama persis, jangan ubah state
       if (
          source.droppableId === destination.droppableId &&
          source.index === destination.index
@@ -78,7 +77,6 @@ export default function App() {
          return;
       }
 
-      // pilih state sesuai mode
       if (mode === "classic") {
          setClassicColumns((prev) => {
             const startCol = source.droppableId;
@@ -88,9 +86,7 @@ export default function App() {
             const [removed] = startItems.splice(source.index, 1);
 
             const endItems =
-               startCol === endCol
-                  ? startItems // kalau sama kolomnya, kita pakai startItems saja
-                  : Array.from(prev[endCol]);
+               startCol === endCol ? startItems : Array.from(prev[endCol]);
 
             if (startCol !== endCol) {
                endItems.splice(destination.index, 0, removed);
@@ -129,6 +125,7 @@ export default function App() {
          });
       }
    };
+
    const handleAddCustom = () => {
       const newName = customInput.trim();
       if (newName === "") return;
@@ -161,45 +158,22 @@ export default function App() {
       }
    };
 
-   const handleSwitchMode = (newMode) => {
-      setMode(newMode);
-      if (newMode === "classic") {
-         // reset sesuai category
-         if (classicCategory === "band") {
-            setClassicColumns({
-               pool: classicData.band,
-               S: [],
-               A: [],
-               B: [],
-               C: [],
-               D: [],
-               E: [],
-            });
-         } else {
-            setClassicColumns({
-               pool: classicData.music[musicSubcategory] || [],
-               S: [],
-               A: [],
-               B: [],
-               C: [],
-               D: [],
-               E: [],
-            });
-         }
-      }
+   const handleChooseMode = (chosenMode) => {
+      setMode(chosenMode);
+      setShowModeSelect(false); // ⬅️ hilangkan mode select
    };
 
    const columns = mode === "classic" ? classicColumns : customColumns;
 
    return (
       <div className="min-h-screen">
-         {/* Landing Page dengan animasi */}
+         {/* Landing */}
          <AnimatePresence>
             {showLanding && (
                <motion.div
                   key="landing"
                   initial={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -200 }} // swipe up saat hilang
+                  exit={{ opacity: 0, y: -200 }}
                   transition={{ duration: 0.8, ease: "easeInOut" }}
                   className="flex flex-col items-center justify-center h-screen bg-gradient-to-b from-blue-500 to-purple-600 text-white"
                >
@@ -218,7 +192,10 @@ export default function App() {
                   <motion.button
                      whileTap={{ scale: 0.9 }}
                      whileHover={{ scale: 1.05 }}
-                     onClick={() => setShowLanding(false)}
+                     onClick={() => {
+                        setShowLanding(false);
+                        setShowModeSelect(true); // ⬅️ setelah landing → pilih mode
+                     }}
                      className="px-6 py-3 bg-white text-blue-600 rounded-lg font-semibold hover:bg-gray-200 transition"
                   >
                      Start
@@ -227,8 +204,42 @@ export default function App() {
             )}
          </AnimatePresence>
 
+         {/* Pilihan Mode */}
+         <AnimatePresence>
+            {showModeSelect && (
+               <motion.div
+                  key="modeselect"
+                  initial={{ opacity: 0, scale: 0.8, y: 50 }}
+                  animate={{ opacity: 1, scale: 1, y: 0 }}
+                  exit={{ opacity: 0, scale: 0.8, y: -50 }}
+                  transition={{ duration: 0.5 }}
+                  className="flex flex-col items-center justify-center h-screen bg-gradient-to-b from-purple-600 to-blue-500 text-white"
+               >
+                  <h2 className="text-3xl font-bold mb-6">Pilih Mode</h2>
+                  <div className="flex gap-6">
+                     <motion.button
+                        whileHover={{ scale: 1.1 }}
+                        whileTap={{ scale: 0.95 }}
+                        onClick={() => handleChooseMode("classic")}
+                        className="px-6 py-3 bg-white text-blue-600 rounded-lg font-semibold hover:bg-gray-200 transition"
+                     >
+                        Classic
+                     </motion.button>
+                     <motion.button
+                        whileHover={{ scale: 1.1 }}
+                        whileTap={{ scale: 0.95 }}
+                        onClick={() => handleChooseMode("custom")}
+                        className="px-6 py-3 bg-white text-blue-600 rounded-lg font-semibold hover:bg-gray-200 transition"
+                     >
+                        Custom
+                     </motion.button>
+                  </div>
+               </motion.div>
+            )}
+         </AnimatePresence>
+
          {/* Main App */}
-         {!showLanding && (
+         {!showLanding && !showModeSelect && (
             <motion.div
                key="mainapp"
                initial={{ opacity: 0, scale: 0.9 }}
@@ -239,29 +250,6 @@ export default function App() {
                <div className="flex justify-center items-center py-4">
                   <img className="w-10 h-10" src={logo} alt="Logo" />
                   <h1 className="text-3xl font-bold text-center">imagine</h1>
-               </div>
-
-               <div className="flex justify-center gap-4 mb-4">
-                  <button
-                     onClick={() => handleSwitchMode("classic")}
-                     className={`px-4 py-2 rounded ${
-                        mode === "classic"
-                           ? "bg-blue-500 text-white"
-                           : "bg-gray-200"
-                     }`}
-                  >
-                     Classic
-                  </button>
-                  <button
-                     onClick={() => handleSwitchMode("custom")}
-                     className={`px-4 py-2 rounded ${
-                        mode === "custom"
-                           ? "bg-blue-500 text-white"
-                           : "bg-gray-200"
-                     }`}
-                  >
-                     Custom
-                  </button>
                </div>
 
                {mode === "custom" && (
