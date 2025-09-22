@@ -5,6 +5,8 @@ import ItemCard from "./components/ItemCard";
 import { classicData } from "./data";
 import logo from "./assets/logo.png";
 import Metallica from "./assets/Metallica.mp3";
+import TheBeatles from "./assets/TheBeatles.mp3";
+import Disturbed from "./assets/Disturbed.mp3";
 import { motion, AnimatePresence } from "framer-motion";
 
 const grades = ["S", "A", "B", "C", "D", "E"];
@@ -17,9 +19,12 @@ export default function App() {
    const [classicCategory, setClassicCategory] = useState("band");
    const [musicSubcategory, setMusicSubcategory] = useState("rock");
 
+   // daftar lagu
+   const songs = [Metallica, TheBeatles, Disturbed];
+   const [currentSongIndex, setCurrentSongIndex] = useState(0);
+
    // Audio
    const audioRef = useRef(null);
-
    const [volume, setVolume] = useState(0.3); // default volume
    const [muted, setMuted] = useState(false);
    const [showSettings, setShowSettings] = useState(false);
@@ -54,6 +59,22 @@ export default function App() {
          audioRef.current.muted = muted;
       }
    }, [volume, muted]);
+
+   // ganti lagu saat index berubah
+   useEffect(() => {
+      if (audioRef.current) {
+         audioRef.current.src = songs[currentSongIndex];
+         audioRef.current.play();
+      }
+   }, [currentSongIndex]);
+
+   const handleNextSong = () => {
+      setCurrentSongIndex((prev) => (prev + 1) % songs.length);
+   };
+
+   const handlePrevSong = () => {
+      setCurrentSongIndex((prev) => (prev === 0 ? songs.length - 1 : prev - 1));
+   };
 
    // Columns state
    const [classicColumns, setClassicColumns] = useState({
@@ -183,7 +204,7 @@ export default function App() {
 
    return (
       <div className="min-h-screen">
-         <audio ref={audioRef} src={Metallica} preload="auto" />
+         <audio ref={audioRef} src={songs[currentSongIndex]} preload="auto" />
 
          {/* Landing */}
          <AnimatePresence>
@@ -327,6 +348,27 @@ export default function App() {
                            />
                            <span>Mute Musik</span>
                         </div>
+
+                        <div className="flex justify-between mb-4">
+                           <button
+                              onClick={handlePrevSong}
+                              className="px-3 py-2 bg-blue-500 text-white rounded"
+                           >
+                              ⬅️ Prev
+                           </button>
+                           <button
+                              onClick={handleNextSong}
+                              className="px-3 py-2 bg-blue-500 text-white rounded"
+                           >
+                              Next ➡️
+                           </button>
+                        </div>
+
+                        <p className="text-sm mb-4">
+                           Now Playing:{" "}
+                           {songs[currentSongIndex].split("/").pop()}
+                        </p>
+
                         <button
                            onClick={() => setShowSettings(false)}
                            className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 w-full"
