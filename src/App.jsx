@@ -46,9 +46,9 @@ export default function App() {
          audioRef.current.volume = 0.1;
          audioRef.current.play();
 
-         let currentVolume = 0.1;
+         let currentVolume = 0.00005;
          const targetVolume = volume; // gunakan state volume
-         const step = 0.02;
+         const step = 0.005;
          const intervalTime = 200;
 
          const fadeInterval = setInterval(() => {
