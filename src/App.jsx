@@ -27,8 +27,8 @@ export default function App() {
 
          let currentVolume = 0.01;
          const targetVolume = 1; // volume akhir
-         const step = 0.01; // besar kenaikan tiap step
-         const intervalTime = 300; // tiap 200ms naik step
+         const step = 0.005; // besar kenaikan tiap step
+         const intervalTime = 400; // tiap 200ms naik step
 
          const fadeInterval = setInterval(() => {
             currentVolume += step;
