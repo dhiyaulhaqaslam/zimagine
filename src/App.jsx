@@ -263,7 +263,7 @@ export default function App() {
                   >
                      ← Back
                   </button>
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center">
                      <img className="w-10 h-10" src={logo} alt="Logo" />
                      <h1 className="text-3xl font-bold text-center">imagine</h1>
                   </div>
