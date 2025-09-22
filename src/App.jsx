@@ -4,6 +4,7 @@ import GradeColumn from "./components/GradeColumn";
 import ItemCard from "./components/ItemCard";
 import { classicData } from "./data";
 import logo from "./assets/logo.png";
+import useAudioBuffer from "./hooks/useAudioBuffer";
 import DiscordJoin from "./assets/DiscordJoin.mp3";
 import DiscordLeave from "./assets/DiscordLeave.mp3";
 import { motion, AnimatePresence } from "framer-motion";
@@ -17,6 +18,9 @@ export default function App() {
 
    const [classicCategory, setClassicCategory] = useState("band");
    const [musicSubcategory, setMusicSubcategory] = useState("rock");
+
+   const playJoin = useAudioBuffer(DiscordJoin);
+   const playLeave = useAudioBuffer(DiscordLeave);
 
    const [classicColumns, setClassicColumns] = useState({
       pool: classicData.band,
@@ -40,23 +44,6 @@ export default function App() {
 
    const [customInput, setCustomInput] = useState("");
    const [errorMsg, setErrorMsg] = useState("");
-
-   // audio refs
-   const joinRef = useRef(null);
-   const leaveRef = useRef(null);
-
-   const playJoin = () => {
-      if (joinRef.current) {
-         joinRef.current.currentTime = 0;
-         joinRef.current.play();
-      }
-   };
-   const playLeave = () => {
-      if (leaveRef.current) {
-         leaveRef.current.currentTime = 0;
-         leaveRef.current.play();
-      }
-   };
 
    useEffect(() => {
       if (mode === "classic") {
@@ -185,9 +172,6 @@ export default function App() {
 
    return (
       <div className="min-h-screen">
-         <audio ref={joinRef} src={DiscordJoin} />
-         <audio ref={leaveRef} src={DiscordLeave} />
-
          {/* Landing */}
          <AnimatePresence>
             {showLanding && (
