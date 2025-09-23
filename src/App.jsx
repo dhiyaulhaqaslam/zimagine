@@ -458,7 +458,16 @@ export default function App() {
                   <div className="grid grid-cols-1 md:grid-cols-7 gap-4">
                      <GradeColumn grade="pool" items={columns.pool}>
                         {columns.pool.map((item, index) => (
-                           <ItemCard key={item.id} item={item} index={index} />
+                           <ItemCard
+                              key={item.id}
+                              item={item}
+                              index={index}
+                              onDelete={
+                                 mode === "custom"
+                                    ? handleDeleteCustomItem
+                                    : null
+                              }
+                           />
                         ))}
                      </GradeColumn>
 
