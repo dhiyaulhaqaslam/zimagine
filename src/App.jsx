@@ -113,17 +113,44 @@ export default function App() {
            };
    });
 
-   const handleDeleteCustomItem = (id) => {
-      setCustomColumns((prev) => ({
-         ...prev,
-         pool: prev.pool.filter((item) => item.id !== id),
-         S: prev.S.filter((item) => item.id !== id),
-         A: prev.A.filter((item) => item.id !== id),
-         B: prev.B.filter((item) => item.id !== id),
-         C: prev.C.filter((item) => item.id !== id),
-         D: prev.D.filter((item) => item.id !== id),
-         E: prev.E.filter((item) => item.id !== id),
-      }));
+   const [showDeletePanel, setShowDeletePanel] = useState(false);
+   const [selectedToDelete, setSelectedToDelete] = useState([]);
+
+   const toggleSelectToDelete = (id) => {
+      setSelectedToDelete((prev) =>
+         prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
+      );
+   };
+
+   // hapus yang dipilih
+   const handleDeleteSelected = () => {
+      let newCols = { ...columns };
+      for (const grade of ["pool", ...grades]) {
+         newCols[grade] = newCols[grade].filter(
+            (item) => !selectedToDelete.includes(item.id)
+         );
+      }
+      setColumns(newCols);
+      localStorage.setItem("customColumns", JSON.stringify(newCols));
+      setSelectedToDelete([]);
+      setShowDeletePanel(false);
+   };
+
+   // hapus semua
+   const handleDeleteAll = () => {
+      const emptyCols = {
+         pool: [],
+         S: [],
+         A: [],
+         B: [],
+         C: [],
+         D: [],
+         E: [],
+      };
+      setColumns(emptyCols);
+      localStorage.setItem("customColumns", JSON.stringify(emptyCols));
+      setSelectedToDelete([]);
+      setShowDeletePanel(false);
    };
 
    // 🔹 Simpan otomatis setiap customColumns berubah
@@ -247,6 +274,54 @@ export default function App() {
 
    return (
       <div className="min-h-screen">
+         {showDeletePanel && (
+            <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+               <div className="bg-white p-4 rounded shadow w-80 max-h-[80vh] overflow-auto">
+                  <h2 className="text-lg font-bold mb-2">
+                     Pilih item yang ingin dihapus
+                  </h2>
+                  <div className="space-y-1 mb-3">
+                     {allCustomItems.length === 0 && (
+                        <div className="text-gray-500">Tidak ada item</div>
+                     )}
+                     {allCustomItems.map((item) => (
+                        <label
+                           key={item.id}
+                           className="flex items-center gap-2"
+                        >
+                           <input
+                              type="checkbox"
+                              checked={selectedToDelete.includes(item.id)}
+                              onChange={() => toggleSelectToDelete(item.id)}
+                           />
+                           <span>{item.name}</span>
+                        </label>
+                     ))}
+                  </div>
+                  <div className="flex gap-2">
+                     <button
+                        onClick={handleDeleteSelected}
+                        className="flex-1 bg-red-500 text-white px-2 py-1 rounded disabled:opacity-50"
+                        disabled={selectedToDelete.length === 0}
+                     >
+                        Hapus yang dipilih
+                     </button>
+                     <button
+                        onClick={handleDeleteAll}
+                        className="flex-1 bg-gray-500 text-white px-2 py-1 rounded"
+                     >
+                        Hapus semua
+                     </button>
+                  </div>
+                  <button
+                     onClick={() => setShowDeletePanel(false)}
+                     className="mt-3 w-full bg-blue-500 text-white px-2 py-1 rounded"
+                  >
+                     Batal
+                  </button>
+               </div>
+            </div>
+         )}
          <audio ref={audioRef} src={songs[currentSongIndex]} preload="auto" />
 
          {/* Landing */}
@@ -446,6 +521,20 @@ export default function App() {
                         >
                            💾 Save
                         </button>
+                        <div className="flex gap-2 mb-4">
+                           <button
+                              onClick={handleSaveCustomItems}
+                              className="px-3 py-1 bg-green-500 text-white rounded"
+                           >
+                              💾 Save
+                           </button>
+                           <button
+                              onClick={() => setShowDeletePanel(true)}
+                              className="px-3 py-1 bg-red-500 text-white rounded"
+                           >
+                              🗑 Delete
+                           </button>
+                        </div>
                      </div>
                      {errorMsg && (
                         <p className="mt-1 text-red-500 text-sm">{errorMsg}</p>
