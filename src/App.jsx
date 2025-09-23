@@ -16,7 +16,7 @@ export const gradeColors = {
    C: "#8A2BE2",
    D: "#FFA500",
    E: "#DC3545",
-   pool: "#E5E7EB", // gray-200 untuk pool
+   pool: "#E5E7EB",
 };
 
 const grades = ["S", "A", "B", "C", "D", "E"];
@@ -35,11 +35,10 @@ export default function App() {
 
    // Audio
    const audioRef = useRef(null);
-   const [volume, setVolume] = useState(0.3); // default volume
+   const [volume, setVolume] = useState(0.3);
    const [muted, setMuted] = useState(false);
    const [showSettings, setShowSettings] = useState(false);
 
-   // jalankan fade-in saat start
    const playWithFadeIn = () => {
       if (audioRef.current) {
          audioRef.current.muted = muted;
@@ -47,7 +46,7 @@ export default function App() {
          audioRef.current.play();
 
          let currentVolume = 0.00005;
-         const targetVolume = volume; // gunakan state volume
+         const targetVolume = volume;
          const step = 0.005;
          const intervalTime = 200;
 
@@ -62,7 +61,6 @@ export default function App() {
       }
    };
 
-   // update volume dan mute realtime
    useEffect(() => {
       if (audioRef.current) {
          audioRef.current.volume = volume;
@@ -70,7 +68,6 @@ export default function App() {
       }
    }, [volume, muted]);
 
-   // ganti lagu saat index berubah
    useEffect(() => {
       if (audioRef.current) {
          audioRef.current.src = songs[currentSongIndex];
@@ -86,7 +83,6 @@ export default function App() {
       setCurrentSongIndex((prev) => (prev === 0 ? songs.length - 1 : prev - 1));
    };
 
-   // Columns state
    const [classicColumns, setClassicColumns] = useState({
       pool: classicData.band,
       S: [],
@@ -97,7 +93,6 @@ export default function App() {
       E: [],
    });
 
-   // 🔹 Ambil dari localStorage untuk customColumns
    const [customColumns, setCustomColumns] = useState(() => {
       const saved = localStorage.getItem("customColumns");
       return saved
@@ -113,8 +108,14 @@ export default function App() {
            };
    });
 
+   // panel delete
    const [showDeletePanel, setShowDeletePanel] = useState(false);
    const [selectedToDelete, setSelectedToDelete] = useState([]);
+
+   const allCustomItems = [
+      ...customColumns.pool,
+      ...grades.flatMap((g) => customColumns[g]),
+   ];
 
    const toggleSelectToDelete = (id) => {
       setSelectedToDelete((prev) =>
@@ -122,21 +123,19 @@ export default function App() {
       );
    };
 
-   // hapus yang dipilih
    const handleDeleteSelected = () => {
-      let newCols = { ...columns };
+      const newCols = {};
       for (const grade of ["pool", ...grades]) {
-         newCols[grade] = newCols[grade].filter(
+         newCols[grade] = customColumns[grade].filter(
             (item) => !selectedToDelete.includes(item.id)
          );
       }
-      setColumns(newCols);
+      setCustomColumns(newCols);
       localStorage.setItem("customColumns", JSON.stringify(newCols));
       setSelectedToDelete([]);
       setShowDeletePanel(false);
    };
 
-   // hapus semua
    const handleDeleteAll = () => {
       const emptyCols = {
          pool: [],
@@ -147,13 +146,12 @@ export default function App() {
          D: [],
          E: [],
       };
-      setColumns(emptyCols);
+      setCustomColumns(emptyCols);
       localStorage.setItem("customColumns", JSON.stringify(emptyCols));
       setSelectedToDelete([]);
       setShowDeletePanel(false);
    };
 
-   // 🔹 Simpan otomatis setiap customColumns berubah
    useEffect(() => {
       localStorage.setItem("customColumns", JSON.stringify(customColumns));
    }, [customColumns]);
@@ -197,17 +195,15 @@ export default function App() {
          return;
       }
 
-      const setColumns =
-         mode === "classic" ? setClassicColumns : setCustomColumns;
+      const setCols = mode === "classic" ? setClassicColumns : setCustomColumns;
 
-      setColumns((prev) => {
+      setCols((prev) => {
          const startCol = source.droppableId;
          const endCol = destination.droppableId;
 
          const startItems = Array.from(prev[startCol]);
          const [removed] = startItems.splice(source.index, 1);
 
-         // tambahkan color sesuai endCol
          removed.color = gradeColors[endCol] || "#FFFFFF";
 
          const endItems =
@@ -264,7 +260,6 @@ export default function App() {
       setShowModeSelect(false);
    };
 
-   // opsional tombol save manual
    const handleSaveCustom = () => {
       localStorage.setItem("customColumns", JSON.stringify(customColumns));
       alert("Data custom tersimpan!");
@@ -322,6 +317,7 @@ export default function App() {
                </div>
             </div>
          )}
+
          <audio ref={audioRef} src={songs[currentSongIndex]} preload="auto" />
 
          {/* Landing */}
@@ -514,27 +510,18 @@ export default function App() {
                         >
                            Tambah
                         </button>
-                        {/* tombol save manual */}
                         <button
                            onClick={handleSaveCustom}
                            className="px-4 py-2 bg-green-500 text-white rounded"
                         >
                            💾 Save
                         </button>
-                        <div className="flex gap-2 mb-4">
-                           <button
-                              onClick={handleSaveCustomItems}
-                              className="px-3 py-1 bg-green-500 text-white rounded"
-                           >
-                              💾 Save
-                           </button>
-                           <button
-                              onClick={() => setShowDeletePanel(true)}
-                              className="px-3 py-1 bg-red-500 text-white rounded"
-                           >
-                              🗑 Delete
-                           </button>
-                        </div>
+                        <button
+                           onClick={() => setShowDeletePanel(true)}
+                           className="px-4 py-2 bg-red-500 text-white rounded"
+                        >
+                           🗑 Delete
+                        </button>
                      </div>
                      {errorMsg && (
                         <p className="mt-1 text-red-500 text-sm">{errorMsg}</p>
@@ -551,11 +538,7 @@ export default function App() {
                               key={item.id}
                               item={item}
                               index={index}
-                              onDelete={
-                                 mode === "custom"
-                                    ? handleDeleteCustomItem
-                                    : null
-                              }
+                              onDelete={null}
                            />
                         ))}
                      </GradeColumn>
@@ -571,11 +554,7 @@ export default function App() {
                                  key={item.id}
                                  item={item}
                                  index={index}
-                                 onDelete={
-                                    mode === "custom"
-                                       ? handleDeleteCustomItem
-                                       : null
-                                 }
+                                 onDelete={null}
                               />
                            ))}
                         </GradeColumn>
