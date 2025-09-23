@@ -113,6 +113,19 @@ export default function App() {
            };
    });
 
+   const handleDeleteCustomItem = (id) => {
+      setCustomColumns((prev) => ({
+         ...prev,
+         pool: prev.pool.filter((item) => item.id !== id),
+         S: prev.S.filter((item) => item.id !== id),
+         A: prev.A.filter((item) => item.id !== id),
+         B: prev.B.filter((item) => item.id !== id),
+         C: prev.C.filter((item) => item.id !== id),
+         D: prev.D.filter((item) => item.id !== id),
+         E: prev.E.filter((item) => item.id !== id),
+      }));
+   };
+
    // 🔹 Simpan otomatis setiap customColumns berubah
    useEffect(() => {
       localStorage.setItem("customColumns", JSON.stringify(customColumns));
