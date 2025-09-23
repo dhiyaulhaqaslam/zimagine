@@ -460,6 +460,11 @@ export default function App() {
                                  key={item.id}
                                  item={item}
                                  index={index}
+                                 onDelete={
+                                    mode === "custom"
+                                       ? handleDeleteCustomItem
+                                       : null
+                                 }
                               />
                            ))}
                         </GradeColumn>
