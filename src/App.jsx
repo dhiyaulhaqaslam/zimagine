@@ -97,15 +97,26 @@ export default function App() {
       E: [],
    });
 
-   const [customColumns, setCustomColumns] = useState({
-      pool: [],
-      S: [],
-      A: [],
-      B: [],
-      C: [],
-      D: [],
-      E: [],
+   // 🔹 Ambil dari localStorage untuk customColumns
+   const [customColumns, setCustomColumns] = useState(() => {
+      const saved = localStorage.getItem("customColumns");
+      return saved
+         ? JSON.parse(saved)
+         : {
+              pool: [],
+              S: [],
+              A: [],
+              B: [],
+              C: [],
+              D: [],
+              E: [],
+           };
    });
+
+   // 🔹 Simpan otomatis setiap customColumns berubah
+   useEffect(() => {
+      localStorage.setItem("customColumns", JSON.stringify(customColumns));
+   }, [customColumns]);
 
    const [customInput, setCustomInput] = useState("");
    const [errorMsg, setErrorMsg] = useState("");
@@ -175,6 +186,7 @@ export default function App() {
          };
       });
    };
+
    const handleAddCustom = () => {
       const newName = customInput.trim();
       if (newName === "") return;
@@ -210,6 +222,12 @@ export default function App() {
    const handleChooseMode = (chosenMode) => {
       setMode(chosenMode);
       setShowModeSelect(false);
+   };
+
+   // opsional tombol save manual
+   const handleSaveCustom = () => {
+      localStorage.setItem("customColumns", JSON.stringify(customColumns));
+      alert("Data custom tersimpan!");
    };
 
    const columns = mode === "classic" ? classicColumns : customColumns;
@@ -407,6 +425,13 @@ export default function App() {
                            className="px-4 py-2 bg-blue-500 text-white rounded"
                         >
                            Tambah
+                        </button>
+                        {/* tombol save manual */}
+                        <button
+                           onClick={handleSaveCustom}
+                           className="px-4 py-2 bg-green-500 text-white rounded"
+                        >
+                           💾 Save
                         </button>
                      </div>
                      {errorMsg && (
