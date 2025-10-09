@@ -108,6 +108,12 @@ export default function App() {
            };
    });
 
+   // tiga slot penyimpanan
+   const [saveSlots, setSaveSlots] = useState(() => {
+      const saved = localStorage.getItem("zimagineSaveSlots");
+      return saved ? JSON.parse(saved) : [null, null, null]; // 3 slot kosong
+   });
+
    // panel delete
    const [showDeletePanel, setShowDeletePanel] = useState(false);
    const [selectedToDelete, setSelectedToDelete] = useState([]);
@@ -263,6 +269,25 @@ export default function App() {
    const handleSaveCustom = () => {
       localStorage.setItem("customColumns", JSON.stringify(customColumns));
       alert("Data custom tersimpan!");
+   };
+
+   const handleSaveSlot = (index) => {
+      const newSlots = [...saveSlots];
+      newSlots[index] = customColumns; // simpan semua kolom custom sekarang
+      setSaveSlots(newSlots);
+      localStorage.setItem("zimagineSaveSlots", JSON.stringify(newSlots));
+      alert(`Slot ${index + 1} tersimpan!`);
+   };
+
+   const handleLoadSlot = (index) => {
+      const saved = saveSlots[index];
+      if (!saved) {
+         alert(`Slot ${index + 1} masih kosong!`);
+         return;
+      }
+      setCustomColumns(saved);
+      localStorage.setItem("customColumns", JSON.stringify(saved));
+      alert(`Slot ${index + 1} dimuat!`);
    };
 
    const columns = mode === "classic" ? classicColumns : customColumns;
@@ -523,6 +548,44 @@ export default function App() {
                            🗑 Delete
                         </button>
                      </div>
+
+                     {/* Slot Save/Load tampil di bawah input */}
+                     <div className="flex gap-2 mt-4">
+                        {saveSlots.map((slot, i) => (
+                           <div
+                              key={i}
+                              className="flex flex-col items-center border rounded p-2 w-full bg-gray-50"
+                           >
+                              <span className="font-semibold mb-1">
+                                 Slot {i + 1}
+                              </span>
+                              <div className="flex gap-1">
+                                 <button
+                                    onClick={() => handleSaveSlot(i)}
+                                    className="bg-green-500 text-white text-sm px-2 py-1 rounded hover:bg-green-600"
+                                 >
+                                    Save
+                                 </button>
+                                 <button
+                                    onClick={() => handleLoadSlot(i)}
+                                    className="bg-blue-500 text-white text-sm px-2 py-1 rounded hover:bg-blue-600"
+                                 >
+                                    Load
+                                 </button>
+                              </div>
+                              {slot ? (
+                                 <span className="text-xs text-green-700 mt-1">
+                                    tersimpan ✓
+                                 </span>
+                              ) : (
+                                 <span className="text-xs text-gray-400 mt-1">
+                                    kosong
+                                 </span>
+                              )}
+                           </div>
+                        ))}
+                     </div>
+
                      {errorMsg && (
                         <p className="mt-1 text-red-500 text-sm">{errorMsg}</p>
                      )}
